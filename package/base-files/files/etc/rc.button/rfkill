@@ -8,12 +8,17 @@ rfkill_state=0
 
 wifi_rfkill_set() {
 	uci set wireless.$1.disabled=$rfkill_state
+	return 0
 }
 
 wifi_rfkill_check() {
 	local disabled
 	config_get disabled $1 disabled
-	[ "$disabled" = "1" ] || rfkill_state=1
+	[ "$disabled" = "1" ] || {
+		rfkill_state=1
+		return 1
+		}
+	return 0
 }
 
 config_load wireless

@@ -18,7 +18,7 @@ load_gpio_switch()
 
 	[ -z "$gpio_pin" ] && {
 		echo >&2 "Skipping gpio_switch '$name' due to missing gpio_pin"
-		return 1
+		return 0
 	}
 
 	local gpio_path
@@ -50,6 +50,8 @@ load_gpio_switch()
 				>"$gpio_path/value"
 		}
 	fi
+	
+	return 0
 }
 
 service_triggers()

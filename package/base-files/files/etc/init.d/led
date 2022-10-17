@@ -33,7 +33,7 @@ load_led() {
 
 	if [ "$trigger" = "rssi" ]; then
 		# handled by rssileds userspace process
-		return
+		return 0
 	fi
 
 	[ "$trigger" = "usbdev" ] && {
@@ -65,7 +65,7 @@ load_led() {
 
 		[ $ret = 0 ] || {
 			echo >&2 "Skipping trigger '$trigger' for led '$name' due to missing kernel module"
-			return 1
+			return 0
 		}
 		case "$trigger" in
 		"netdev")
