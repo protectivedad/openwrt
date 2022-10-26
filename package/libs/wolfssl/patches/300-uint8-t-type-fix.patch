@@ -1,0 +1,26 @@
+diff --git a/wolfcrypt/src/port/devcrypto/README.md b/wolfcrypt/src/port/devcrypto/README.md
+index 7844dca8696..1d158f9382f 100644
+--- a/wolfcrypt/src/port/devcrypto/README.md
++++ b/wolfcrypt/src/port/devcrypto/README.md
+@@ -22,7 +22,7 @@ modprobe cryptodev
+ For default build with all supported features use:
+ 
+ ```
+-./configure --enable-cryptodev
++./configure --enable-devcrypto
+ ```
+ 
+ Or for more control over features used:
+diff --git a/wolfcrypt/src/port/devcrypto/wc_devcrypto.c b/wolfcrypt/src/port/devcrypto/wc_devcrypto.c
+index 2a21d676c89..5c8d9921791 100644
+--- a/wolfcrypt/src/port/devcrypto/wc_devcrypto.c
++++ b/wolfcrypt/src/port/devcrypto/wc_devcrypto.c
+@@ -122,7 +122,7 @@ int wc_DevCryptoCreate(WC_CRYPTODEV* ctx, int type, byte* key, word32 keySz)
+         case CRYPTO_SHA2_512_HMAC:
+             ctx->sess.cipher = 0;
+             ctx->sess.mac    = type;
+-            ctx->sess.mackey    = (u_int8_t*)key;
++            ctx->sess.mackey    = (uint8_t*)key;
+             ctx->sess.mackeylen = keySz;
+             break;
+ 
