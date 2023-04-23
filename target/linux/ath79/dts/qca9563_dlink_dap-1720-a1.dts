@@ -1,0 +1,198 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+#include "qca956x.dtsi"
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/leds/common.h>
+
+/ {
+	model = "D-Link DAP-1720 A1";
+	compatible = "dlink,dap-1720-a1", "qca,qca9563";
+
+	aliases {
+		led-boot = &led_power;
+		led-failsafe = &led_status;
+		led-running = &led_power;
+		led-upgrade = &led_status;
+
+		label-mac-device = &eth0;
+	};
+
+	keys {
+		compatible = "gpio-keys";
+
+		reset {
+			label = "reset";
+			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+			debounce-interval = <60>;
+		};
+
+		wps {
+			label = "wps";
+			gpios = <&gpio 2 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_WPS_BUTTON>;
+			debounce-interval = <60>;
+		};
+
+		modeswitch {
+			label = "mode";
+			gpios = <&gpio 8 GPIO_ACTIVE_LOW>;
+			linux,code = <BTN_0>;
+			linux,input-type = <EV_SW>;
+			debounce-interval = <60>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led_status: status {
+			label = "red:power";
+			function = LED_FUNCTION_STATUS;
+			color = <LED_COLOR_ID_RED>;
+			gpios = <&gpio 5 GPIO_ACTIVE_LOW>;
+			panic-indicator;
+		};
+
+		led_power: power {
+			label = "green:power";
+			function = LED_FUNCTION_POWER;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 6 GPIO_ACTIVE_LOW>;
+		};
+
+		rssilow {
+			label = "red:rssilow";
+			function = LED_FUNCTION_INDICATOR;
+			color = <LED_COLOR_ID_RED>;
+			gpios = <&gpio 20 GPIO_ACTIVE_LOW>;
+		};
+
+		rssimediumlow {
+			label = "green:rssimediumlow";
+			function = LED_FUNCTION_INDICATOR;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 19 GPIO_ACTIVE_LOW>;
+		};
+
+		rssimediumhigh {
+			label = "green:rssimediumhigh";
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <1>;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 15 GPIO_ACTIVE_LOW>;
+		};
+
+		rssihigh {
+			label = "green:rssihigh";
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <2>;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 16 GPIO_ACTIVE_LOW>;
+		};
+
+	};
+
+};
+
+&spi {
+	status = "okay";
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <25000000>;
+
+		partitions: partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "bootloader";
+				reg = <0x000000 0x40000>;
+				read-only;
+			};
+
+			partition@40000 {
+				compatible = "u-boot,env";
+				label = "bdcfg";
+				reg = <0x040000 0x10000>;
+				read-only;
+			};
+
+			partition@50000 {
+				label = "devdata";
+				reg = <0x050000 0x10000>;
+				read-only;
+			};
+
+			partition@60000 {
+				label = "devconf";
+				reg = <0x060000 0x10000>;
+				read-only;
+			};
+
+			partition@70000 {
+				compatible = "seama";
+				label = "firmware";
+				reg = <0x070000 0xf80000>;
+			};
+
+			art: partition@ff0000 {
+				compatible = "nvmem-cells";
+				label = "art";
+				reg = <0xff0000 0x010000>;
+				read-only;
+				#address-cells = <1>;
+				#size-cells = <1>;
+
+				calibration_ath9k: calibration@1000 {
+					reg = <0x1000 0x440>;
+				};
+
+				calibration_ath10k: calibration@5000 {
+					reg = <0x5000 0x844>;
+				};
+			};
+		};
+	};
+};
+
+&mdio0 {
+	status = "okay";
+
+	phy0: ethernet-phy@0 {
+		reg = <0>;
+		phy-mode = "sgmii";
+
+		reset-gpios = <&gpio 11 GPIO_ACTIVE_LOW>;
+	};
+};
+
+&eth0 {
+	status = "okay";
+	phy-handle = <&phy0>;
+};
+
+&wmac {
+	status = "okay";
+
+	nvmem-cells = <&calibration_ath9k>;
+	nvmem-cell-names = "calibration";
+};
+
+&pcie {
+	status = "okay";
+
+	wifi@0,0 {
+		compatible = "qcom,ath10k";
+		reg = <0x0000 0 0 0 0>;
+
+		nvmem-cells = <&calibration_ath10k>;
+		nvmem-cell-names = "calibration";
+	};
+};
+

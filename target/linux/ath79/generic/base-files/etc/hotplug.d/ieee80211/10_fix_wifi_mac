@@ -22,6 +22,12 @@ case "$board" in
 	dlink,dch-g020-a1)
 		mtd_get_mac_text "mp" 0x13 > /sys${DEVPATH}/macaddress
 		;;
+	dlink,dap-1720-a1)
+		[ "$PHYNBR" -eq 0 ] && \
+			mtd_get_mac_ascii devdata "wlan5mac" > /sys${DEVPATH}/macaddress
+		[ "$PHYNBR" -eq 1 ] && \
+			macaddr_add "$(mtd_get_mac_ascii devdata wlan24mac)" 1 > /sys${DEVPATH}/macaddress
+		;;
 	dlink,dap-2230-a1|\
 	dlink,dap-3320-a1)
 		mtd_get_mac_ascii bdcfg "wlanmac" > /sys${DEVPATH}/macaddress
