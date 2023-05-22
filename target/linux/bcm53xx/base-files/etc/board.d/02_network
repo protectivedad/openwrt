@@ -29,6 +29,9 @@ bcm53xx_setup_interfaces()
 	meraki,mr32)
 		ucidef_set_interface_lan "poe" "dhcp"
 		;;
+	netgear,r8500)
+		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4 lan5 lan6 extsw" "wan"
+		;;
 	phicomm,k3)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" "wan"
 		;;

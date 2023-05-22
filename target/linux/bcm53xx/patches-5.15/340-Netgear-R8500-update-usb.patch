@@ -1,0 +1,187 @@
+--- a/arch/arm/boot/dts/bcm47094-netgear-r8500.dts
++++ b/arch/arm/boot/dts/bcm47094-netgear-r8500.dts
+@@ -54,11 +54,36 @@
+ 		led-usb2 {
+ 			label = "bcm53xx:white:usb2";
+ 			gpios = <&chipcommon 17 GPIO_ACTIVE_LOW>;
++			trigger-sources = <&ohci_port2>, <&ehci_port2>;
++			linux,default-trigger = "usbport";
+ 		};
+ 
+ 		led-usb3 {
+ 			label = "bcm53xx:white:usb3";
+ 			gpios = <&chipcommon 18 GPIO_ACTIVE_LOW>;
++			trigger-sources = <&ohci_port1>, <&ehci_port1>,
++					  <&xhci_port1>;
++			linux,default-trigger = "usbport";
++		};
++
++		led-aeriels {
++			label = "r8500:blue:aeriels";
++			gpios = <&chipcommon 15 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-led {
++			label = "r8500:blue:led";
++			gpios = <&chipcommon 1 GPIO_ACTIVE_LOW>;
++		};
++
++		led-wps {
++			label = "r8500:blue:wps";
++			gpios = <&chipcommon 14 GPIO_ACTIVE_HIGH>;
++		};
++
++		led-wifi {
++			label = "r8500:blue:wifi";
++			gpios = <&chipcommon 20 GPIO_ACTIVE_LOW>;
+ 		};
+ 	};
+ 
+@@ -68,7 +93,7 @@
+ 		button-brightness {
+ 			label = "Backlight";
+ 			linux,code = <KEY_BRIGHTNESS_ZERO>;
+-			gpios = <&chipcommon 1 GPIO_ACTIVE_LOW>;
++			gpios = <&chipcommon 5 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+ 		button-restart {
+@@ -80,48 +105,99 @@
+ 		button-wps {
+ 			label = "WPS";
+ 			linux,code = <KEY_WPS_BUTTON>;
+-			gpios = <&chipcommon 14 GPIO_ACTIVE_LOW>;
++			gpios = <&chipcommon 4 GPIO_ACTIVE_LOW>;
+ 		};
+ 
+ 		button-rfkill {
+ 			label = "WiFi";
+ 			linux,code = <KEY_RFKILL>;
+-			gpios = <&chipcommon 20 GPIO_ACTIVE_LOW>;
++			gpios = <&chipcommon 19 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	mdio-mux@18003000 {
++
++		/* BIT(9) = 1 => external mdio */
++		mdio@200 {
++			reg = <0x200>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			switch@0  {
++				compatible = "brcm,bcm53125";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0>;
++				dsa,member = <1 0>;
++				pinctrl-names = "default";
++				pinctrl-0 = <&pinmux_mdio>;
++
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++
++					sw1_p1: port@1 {
++						reg = <1>;
++						ethernet = <&sw0_p4>;
++						label = "cpu";
++
++						fixed-link {
++							speed = <1000>;
++							full-duplex;
++						};
++					};
++
++					port@2 {
++						reg = <2>;
++						label = "lan4";
++					};
++
++					port@3 {
++						reg = <3>;
++						label = "lan5";
++					};
++
++					port@4 {
++						reg = <4>;
++						label = "lan6";
++					};
++				};
++			};
+ 		};
+ 	};
+ };
+ 
++&usb3 {
++	vcc-gpio = <&chipcommon 0 GPIO_ACTIVE_HIGH>;
++};
++
+ &usb3_phy {
+ 	status = "okay";
+ };
+ 
+ &srab {
++	compatible = "brcm,bcm53012-srab", "brcm,bcm5301x-srab";
+ 	status = "okay";
+ 	dsa,member = <0 0>;
+ 
+ 	ports {
+ 		port@0 {
+-			reg = <0>;
+ 			label = "wan";
+ 		};
+ 
+ 		port@1 {
+-			reg = <1>;
+ 			label = "lan1";
+ 		};
+ 
+ 		port@2 {
+-			reg = <2>;
+ 			label = "lan2";
+ 		};
+ 
+ 		port@3 {
+-			reg = <3>;
+ 			label = "lan3";
+ 		};
+ 
+ 		sw0_p4: port@4 {
+-			reg = <4>;
+ 			label = "extsw";
+ 
+ 			fixed-link {
+@@ -130,15 +206,28 @@
+ 			};
+ 		};
+ 
+-		port@8 {
+-			reg = <8>;
++		port@5 {
++			label = "cpu";
++			status = "disabled";
++
++			fixed-link {
++				speed = <1000>;
++				full-duplex;
++			};
++		};
++
++		port@7 {
+ 			label = "cpu";
+-			ethernet = <&gmac2>;
++			status = "disabled";
+ 
+ 			fixed-link {
+ 				speed = <1000>;
+ 				full-duplex;
+ 			};
+ 		};
++
++		port@8 {
++			label = "cpu";
++		};
+ 	};
+ };
