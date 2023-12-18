@@ -312,6 +312,17 @@ define Device/belkin_f7c027
 endef
 TARGET_DEVICES += belkin_f7c027
 
+define Device/belkin_f7c030
+  SOC := rt5350
+  IMAGE_SIZE := 7616k
+  DEVICE_VENDOR := Belkin
+  DEVICE_MODEL := F7C030
+  DEVICE_PACKAGES := uboot-envtools
+  SUPPORTED_DEVICES += f7c030
+  DEFAULT := n
+endef
+TARGET_DEVICES += belkin_f7c030
+
 define Device/buffalo_whr-g300n
   SOC := rt3052
   IMAGE_SIZE := 3712k
