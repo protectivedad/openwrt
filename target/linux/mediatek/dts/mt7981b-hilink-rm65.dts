@@ -9,9 +9,10 @@
 
 / {
 	model = "Hilink RM65";
-	compatible = "hilink,rm65", "mediatek,mt7981";
+	compatible = "hilink,rm65", "mediatek,mt7981b";
 
 	aliases {
+		label-mac-device = &gmac0;
 		serial0 = &uart0;
 	};
 
@@ -62,7 +63,7 @@
 	gmac0: mac@0 {
 		compatible = "mediatek,eth-mac";
 		reg = <0>;
-		nvmem-cells = <&macaddr 1>;
+		nvmem-cells = <&macaddr_factory_4 (1)>;
 		nvmem-cell-names = "mac-address";
 		phy-mode = "2500base-x";
 
@@ -76,7 +77,7 @@
 	gmac1: mac@1 {
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
-		nvmem-cells = <&macaddr 2>;
+		nvmem-cells = <&macaddr_factory_4 (2)>;
 		nvmem-cell-names = "mac-address";
 		phy-mode = "gmii";
 		phy-handle = <&int_gbe_phy>;
@@ -172,7 +173,7 @@
 
 			partition@0 {
 				label = "BL2";
-				reg = <0x00000 0x0100000>;
+				reg = <0x0000000 0x0100000>;
 				read-only;
 			};
 
@@ -191,7 +192,11 @@
 					#address-cells = <1>;
 					#size-cells = <1>;
 
-					macaddr: macaddr@4 {
+					eeprom_factory_0: eeprom@0 {
+						reg = <0x0 0x1000>;
+					};
+
+					macaddr_factory_4: macaddr@4 {
 						compatible = "mac-base";
 						reg = <0x4 0x6>;
 						#nvmem-cell-cells = <1>;
@@ -247,8 +252,22 @@
 
 &wifi {
 	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	nvmem-cell-names = "eeprom";
+	nvmem-cells = <&eeprom_factory_0>;
 
-	mediatek,mtd-eeprom = <&factory 0x0>;
+	band@0 {
+		reg = <0>;
+		nvmem-cells = <&macaddr_factory_4 (0)>;
+		nvmem-cell-names = "mac-address";
+	};
+
+	band@1 {
+		reg = <1>;
+		nvmem-cells = <&macaddr_factory_4 (-1)>;
+		nvmem-cell-names = "mac-address";
+	};
 };
 
 &uart0 {
