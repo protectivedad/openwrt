@@ -28,6 +28,17 @@ platform_do_upgrade() {
 		}
 		default_do_upgrade "$1"
 		;;
+	belkin,f7c063)
+		local bootstate=$(fw_printenv -n bootstate 2>/dev/null)
+		local newstate=1
+		if [ "${bootstate}" = "0" ]; then
+			PART_NAME=firmware2
+			newstate=3
+		fi
+		default_do_upgrade "$1"
+		fw_setenv check_boot 0 || exit 1
+		fw_setenv bootstate ${newstate} || exit 1
+		;;
 	tplink,archer-c20-v5|\
 	tplink,archer-c50-v4|\
 	tplink,archer-c50-v6)

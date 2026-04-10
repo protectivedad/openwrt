@@ -1,0 +1,163 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+#include "mt7628an.dtsi"
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/leds/common.h>
+
+/ {
+	compatible = "belkin,f7c063", "mediatek,mt7628an-soc";
+	model = "Wemo Mini Smart Plug";
+
+	aliases {
+		led-boot = &led_status;
+		led-failsafe = &led_status;
+		led-upgrade = &led_status;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led_status: status {
+			color = <LED_COLOR_ID_AMBER>;
+			function = LED_FUNCTION_STATUS;
+			gpios = <&gpio 17 GPIO_ACTIVE_LOW>;
+			default-state = "on";
+		};
+
+		relay_led {
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_POWER;
+			gpios = <&gpio 16 GPIO_ACTIVE_LOW>;
+		};
+
+		relay {
+			gpios = <&gpio 19 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	keys {
+		compatible = "gpio-keys-polled";
+		poll-interval = <50>;
+        
+		autorepeat;
+		power {
+			label = "power";
+			gpios = <&gpio 23 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_POWER>;
+		};
+		
+		gpio18 {
+			label = "gpio18";
+			gpios = <&gpio 18 GPIO_ACTIVE_HIGH>;
+			linux,code = <BTN_0>;
+		};
+	};
+};
+
+&state_default {
+	gpio {
+		groups = "i2c", "wdt", "sdmode", "pwm0";
+		function = "gpio";
+	};
+};
+
+&spi0 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi_pins>, <&spi_cs1_pins>;
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x0 0x30000>;
+				read-only;
+			};
+			partition@30000 {
+				label = "u-boot-env";
+				reg = <0x30000 0x10000>;
+			};
+			partition@40000 {
+				label = "factory";
+				reg = <0x40000 0x10000>;
+				read-only;
+
+				nvmem-layout {
+					compatible = "fixed-layout";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					eeprom_factory_0: eeprom@0 {
+						reg = <0x0 0x400>;
+					};
+
+					macaddr_factory_4: macaddr@4 {
+						reg = <0x04 0x6>;
+					};
+
+					macaddr_factory_28: macaddr@28 {
+						reg = <0x28 0x6>;
+					};
+				};
+			};
+			partition@50000 {
+				compatible = "denx,uimage";
+				label = "firmware";
+				openwrt,cmdline-match = "root=/dev/mtdblock2";
+				reg = <0x50000 0x770000>;
+			};
+			partition@7c0000 {
+				compatible = "denx,uimage";
+				label = "firmware2";
+				openwrt,cmdline-match = "root=/dev/mtdblock4";
+				reg = <0x7c0000 0x770000>;
+			};
+			partition@f30000 {
+				label = "spare";
+				reg = <0xf30000 0x20000>;
+			};
+			partition@f50000 {
+				label = "belkin_settings";
+				reg = <0xf50000 0x90000>;
+			};
+			partition@fe0000 {
+				label = "nvram";
+				reg = <0xfe0000 0x10000>;
+			};
+			partition@ff0000 {
+				label = "user_factory";
+				reg = <0xff0000 0x10000>;
+			};
+		};		
+	};
+};
+
+&ethernet {
+	nvmem-cells = <&macaddr_factory_28>;
+	nvmem-cell-names = "mac-address";
+};
+
+&esw {
+	mediatek,portmap = <0x3e>;
+};
+
+&wmac {
+	status = "okay";
+
+	nvmem-cells = <&eeprom_factory_0>;
+	nvmem-cell-names = "eeprom";
+
+	nvmem-cells = <&macaddr_factory_4 (1)>;
+	nvmem-cell-names = "mac-address";
+};

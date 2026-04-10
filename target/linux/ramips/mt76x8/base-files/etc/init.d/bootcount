@@ -8,6 +8,16 @@ boot() {
 		[ -n "$(fw_printenv bootcount bootchanged 2>/dev/null)" ] &&\
 			echo -e "bootcount\nbootchanged\n" | /usr/sbin/fw_setenv -s -
 		;;
+	belkin,f7c063)
+		local check_boot=$(fw_printenv -n check_boot 2>/dev/null)
+		if [ "${check_boot}" = "1" ]; then
+			local bootstate=$(fw_printenv -n bootstate 2>/dev/null)
+			if [ "${bootstate}" = "1" -o "${bootstate}" = "3" ]; then
+				fw_setenv bootstate $((bootstate - 1))
+			fi
+			fw_setenv check_boot 0
+		fi
+		;;
 	xiaomi,mi-router-4c|\
 	xiaomi,miwifi-3a|\
 	xiaomi,miwifi-nano)

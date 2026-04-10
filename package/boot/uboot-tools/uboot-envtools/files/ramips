@@ -94,6 +94,7 @@ xiaomi,mi-router-cr6608|\
 xiaomi,mi-router-cr6609)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x10000" "0x20000"
 	;;
+belkin,f7c063|\
 buffalo,wsr-1166dhp|\
 buffalo,wsr-600dhp|\
 kroks,kndrt31r16|\

@@ -136,6 +136,15 @@ define Device/asus_rt-n12-vp-b1
 endef
 TARGET_DEVICES += asus_rt-n12-vp-b1
 
+define Device/belkin_f7c063
+  IMAGE_SIZE := 7616k
+  DEVICE_VENDOR := Belkin
+  DEVICE_MODEL := F7C063
+  DEVICE_PACKAGES := uboot-envtools
+  SUPPORTED_DEVICES += f7c063
+endef
+TARGET_DEVICES += belkin_f7c063
+
 define Device/buffalo_wcr-1166ds
   IMAGE_SIZE := 7936k
   BUFFALO_TAG_PLATFORM := MTK
