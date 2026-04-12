@@ -120,6 +120,8 @@ static int __mtdsplit_parse_uimage(struct mtd_info *master,
 				   const struct mtd_partition **pparts,
 				   struct mtd_part_parser_data *data)
 {
+	struct device_node *np = mtd_get_of_node(master);
+	const char *cmdline_match = NULL;
 	struct mtd_partition *parts;
 	u_char *buf;
 	int nr_parts;
@@ -137,6 +139,10 @@ static int __mtdsplit_parse_uimage(struct mtd_info *master,
 	u32 header_offset = 0;
 	u32 part_magic = 0;
 	enum mtdsplit_part_type type;
+
+	of_property_read_string(np, "openwrt,cmdline-match", &cmdline_match);
+	if (cmdline_match && !strstr(saved_command_line, cmdline_match))
+		return 0;
 
 	nr_parts = 2;
 	parts = kzalloc(nr_parts * sizeof(*parts), GFP_KERNEL);
