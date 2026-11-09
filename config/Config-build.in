@@ -188,7 +188,11 @@ menu "Global build settings"
 		  Packages can opt-out via setting PKG_BUILD_FLAGS:=no-mold
 
 	config IPV6
-		def_bool y
+		bool
+		prompt "Enable IPv6 support in packages"
+		default y
+		help
+		  Enables IPv6 support in kernel (builtin) and packages.
 
 	comment "Stripping options"
 
