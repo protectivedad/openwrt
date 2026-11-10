@@ -1,0 +1,32 @@
+. /lib/functions/uci-defaults.sh
+
+board=$(board_name)
+
+board_config_update
+
+case $board in
+dlink,dsp-w115)
+	eval "$(strings /dev/mtd1 | grep -E '^SSID1=|^AuthMode=|^WPAPSK1=')"
+	if [ "WPA2PSK" = "$AuthMode" ]; then
+		AuthMode="psk2"
+	else
+		AuthMode=""
+	fi
+	if [ -z "${SSID1}" ]; then
+		SSID1=DSP_W115_UNK
+		AuthMode=""
+	fi
+	ssid1=$(echo "$SSID1" | awk '{print tolower($0)}')
+	[ -n "${ssid1}" ] && ucidef_set_hostname "${ssid1}"
+
+	if [ -n "$AuthMode" ]; then
+		ucidef_set_wireless all "${SSID1}" psk2 "${WPAPSK1}"
+	else
+		ucidef_set_wireless all "${SSID1}"
+	fi
+	;;
+esac
+
+board_config_flush
+
+exit 0

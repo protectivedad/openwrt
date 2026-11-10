@@ -1,0 +1,22 @@
+
+. /lib/functions.sh
+. /lib/functions/uci-defaults.sh
+. /lib/functions/system.sh
+
+ramips_setup_wwan()
+{
+	local board="$1"
+
+	case $board in
+	dlink,dsp-w115)
+		uci delete network.wwan.device
+		uci delete network.@device[-1].ports
+		uci commit network
+		;;
+	esac
+}
+
+board=$(board_name)
+ramips_setup_wwan $board
+
+exit 0

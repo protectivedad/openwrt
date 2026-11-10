@@ -498,6 +498,16 @@ define Device/dlink_dwr-512-b
 endef
 TARGET_DEVICES += dlink_dwr-512-b
 
+define Device/dlink_dsp-w115
+  SOC := rt5350
+  IMAGE_SIZE := 5952k
+  DEVICE_VENDOR := D-Link
+  DEVICE_MODEL := DSP-W115
+  SUPPORTED_DEVICES += dsp-w115
+  DEFAULT := n
+endef
+TARGET_DEVICES += dlink_dsp-w115
+
 define Device/easyacc_wizard-8800
   SOC := rt5350
   IMAGE_SIZE := 7872k
