@@ -48,6 +48,7 @@ platform_check_image() {
 	dir-620-a1 | \
 	dir-620-d1 | \
 	dir-810l | \
+	dsp-w115 | \
 	e1700 | \
 	ex2700 |\
 	esr-9753 | \

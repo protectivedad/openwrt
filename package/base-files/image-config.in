@@ -24,69 +24,6 @@ config TARGET_PREINIT_SUPPRESS_STDERR
 		the ash shell launched by inittab will display stderr).  That's
 		the same behaviour as seen in previous version of OpenWrt.
 
-config TARGET_PREINIT_TIMEOUT
-	int
-	prompt "Failsafe wait timeout" if PREINITOPT
-	default 2
-	help
-		How long to wait for failsafe mode to be entered before
-		continuing with a regular boot if failsafe not selected.
-
-config TARGET_PREINIT_SHOW_NETMSG
-	bool
-	prompt "Show all preinit network messages" if PREINITOPT
-	default n
-	help
-		Show preinit all network messages (via netmsg broadcast), not only
-		the message indicating to press reset to enter failsafe.  Note that
-		if the architecture doesn't define an interface, and there is no
-		'Preinit network interface' defined, then no messages will be
-		emitted, even if this is set.
-
-config TARGET_PREINIT_SUPPRESS_FAILSAFE_NETMSG
-	bool
-	prompt "Suppress network message indicating failsafe" if PREINITOPT
-	default n
-	help
-		If "Show all preinit network messages" above is not set, then
-		setting this option suppresses the only message that would be
-		emitted otherwise, name the network message to enter failsafe
-		(via netmsg).
-
-config TARGET_PREINIT_IFNAME
-	string
-	prompt "Preinit network interface" if PREINITOPT
-	default ""
-	help
-		Interface for sending preinit messages to network, and any other
-		default networking in failsafe or preinit.  If empty
-		uses $ifname (if defined in /etc/preinit.arch).
-
-config TARGET_PREINIT_IP
-	string
-	prompt "IP address for preinit network messages" if PREINITOPT
-	default "192.168.1.1"
-	help
-		IP address used to configure interface for preinit network
-		messages, including failsafe messages
-
-config TARGET_PREINIT_NETMASK
-	string
-	prompt "Netmask for preinit network messages" if PREINITOPT
-	default "255.255.255.0"
-	help
-		Netmask used to configure interface for preinit network
-		messages, including failsafes messages
-
-config TARGET_PREINIT_BROADCAST
-	string
-	prompt "Broadcast address for preinit network messages" if PREINITOPT
-	default "192.168.1.255"
-	help
-		Broadcast address to which to send preinit network messages, as
-		as failsafe messages
-
-
 menuconfig INITOPT
 	bool "Init configuration options" if IMAGEOPT
 	default n

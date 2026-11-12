@@ -57,6 +57,19 @@ endef
 
 $(eval $(call Profile,DCS930LB1))
 
+define Profile/DSPW115
+	NAME:=Dlink DSP-W115
+        PACKAGES:=\
+		-kmod-usb-core -kmod-usb-dwc2 \
+		-kmod-ledtrig-usbdev
+endef
+
+define Profile/DSPW115/Description
+	Package set for Dlink DSP-W115 board
+endef
+
+$(eval $(call Profile,DSPW115))
+
 define Profile/DIR610A1
 	NAME:=Dlink DIR-610 A1
 	PACKAGES:=kmod-ledtrig-netdev kmod-ledtrig-timer

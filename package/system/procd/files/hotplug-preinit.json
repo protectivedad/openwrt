@@ -11,10 +11,4 @@
 			],
 		],
 	}, ],
-	[ "if",
-		[ "and",
-			[ "eq", "SUBSYSTEM", "button" ],
-		],
-		[ "exec", "/etc/rc.button/failsafe" ]
-	],
 ]

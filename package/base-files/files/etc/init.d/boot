@@ -34,7 +34,6 @@ boot() {
 	touch /tmp/resolv.conf.auto
 	ln -sf /tmp/resolv.conf.auto /tmp/resolv.conf
 	grep -q debugfs /proc/filesystems && /bin/mount -o noatime -t debugfs debugfs /sys/kernel/debug
-	[ "$FAILSAFE" = "true" ] && touch /tmp/.failsafe
 
 	/sbin/kmodloader
 
@@ -49,7 +48,7 @@ boot() {
 
 	/bin/board_detect
 	uci_apply_defaults
-	
+
 	# temporary hack until configd exists
 	/sbin/reload_config
 

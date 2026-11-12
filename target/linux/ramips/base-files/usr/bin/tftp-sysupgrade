@@ -1,0 +1,35 @@
+#!/bin/sh
+# Retreives a TFTP upload, then sysupgrades from it.
+
+TFTP=/usr/bin/tftp
+TFTP_DIR=/tmp
+SERVER=192.168.1.100
+FIRMWARE=openwrt-upgrade.bin
+MD5=openwrt-upgrade.md5
+MD5SUM=/usr/bin/md5sum
+SYSUPGRADE=/sbin/sysupgrade
+
+[ -f "$TFTP" ] || exit 1
+
+mkdir -p "$TFTP_DIR"
+cd "$TFTP_DIR"
+
+# pull upgrade firmware and md5 file using tftp
+logger "tftp-sysupgrade: ready to retrieve firmware..."
+while true; do
+	rm -f "$MD5" "$FIRMWARE"
+
+	sleep 2
+	"$TFTP" -g -r "$MD5" "$SERVER" || continue
+	logger "tftp-sysupgrade: retreived $MD5, retrieving $FIRMWARE..."
+	if [ -f "$MD5" ]; then
+		"$TFTP" -g -r "$FIRMWARE" "$SERVER" || continue
+		logger "tftp-sysupgrade: retreived $FIRMWARE, verifying..."
+		if [ -f "$FIRMWARE" ]; then
+			"$MD5SUM" -s -c "$MD5" || continue
+			logger "tftp-sysupgrade: verified $FIRMWARE, flashing..."
+			"$SYSUPGRADE" -v -n "$FIRMWARE"
+			break
+		fi
+	fi
+done

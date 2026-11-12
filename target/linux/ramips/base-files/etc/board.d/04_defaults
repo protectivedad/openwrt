@@ -1,0 +1,20 @@
+#!/bin/sh
+
+. /lib/ramips.sh
+. /lib/functions/uci-defaults-new.sh
+
+board_config_update
+board=$(ramips_board_name)
+
+case $board in
+dsp-w115)
+	eval "$(strings /dev/mtd1 | grep -E '^SSID1=|^WPAPSK1=')"
+	ucidef_set_hostname "${SSID1}"
+	ucidef_set_wireless all "${SSID1}" psk2 "${WPAPSK1}"
+	;;
+esac
+
+board_config_flush
+
+exit 0
+

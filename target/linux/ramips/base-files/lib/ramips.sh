@@ -151,6 +151,9 @@ ramips_board_detect() {
 	*"DAP-1350")
 		name="dap-1350"
 		;;
+	*"DSP-W115")
+		name="dsp-w115"
+		;;
 	*"ESR-9753")
 		name="esr-9753"
 		;;

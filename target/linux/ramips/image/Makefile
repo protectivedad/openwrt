@@ -527,6 +527,9 @@ Image/Build/Profile/HW550-3G=$(call BuildFirmware/Default8M/$(1),$(1),hw550-3g,H
 belkin_f5d8235v2_mtd_size=7929856
 Image/Build/Profile/F5D8235V2=$(call BuildFirmware/CustomFlash/$(1),$(1),f5d8235v2,F5D8235_V2,$(belkin_f5d8235v2_mtd_size))
 
+dlink_dspw115_mtd_size=7798784
+Image/Build/Profile/DSPW115=$(call BuildFirmware/CustomFlash/$(1),$(1),dlinkdspw115,DSP-W115,$(dlink_dspw115_mtd_size))
+
 # 0x770000
 belkin_f7c027_mtd_size=7798784
 Image/Build/Profile/F7C027=$(call BuildFirmware/CustomFlash/$(1),$(1),belkinf7c027,F7C027,$(belkin_f7c027_mtd_size))

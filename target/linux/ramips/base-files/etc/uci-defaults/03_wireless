@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. /lib/ramips.sh
+
+board=$(ramips_board_name)
+
+case $board in
+dsp-w115)
+        eval "$(strings /dev/mtd1 | grep -E '^SSID1=|^WPAPSK1=')"
+
+	uci set system.@system[0].hostname="${SSID1}"
+	uci commit system
+
+        # wireless only device so do NOT disable
+        uci set wireless.@wifi-device[0].channel='0'
+        uci set wireless.@wifi-device[0].disabled='0'
+	uci set wireless.@wifi-iface[0].ssid="${SSID1}"
+	uci set wireless.@wifi-iface[0].key="${WPAPSK1}"
+	uci set wireless.@wifi-iface[0].encryption="psk2"
+        uci set wireless.@wifi-iface[0].disabled='0'
+        uci commit wireless
+
+	uci delete network.lan.ifname
+	uci commit network
+        ;;
+esac
+
+exit 0
+
