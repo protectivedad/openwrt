@@ -1,0 +1,9 @@
+set -x
+
+. /lib/functions.sh
+logger "mqtt hotplug $ACTION"
+if [ "$ACTION" = "ifup" ]; then
+	config_load mqtt-client
+	config_get enabled $INTERFACE enabled 0
+	[ "1" = "$enabled" ] && /usr/bin/micropython -m /usr/bin/mqtt-client.mpy $INTERFACE &
+fi

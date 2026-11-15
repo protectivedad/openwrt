@@ -1,0 +1,14 @@
+#!/bin/sh /etc/rc.common
+START=99
+USE_PROCD=1
+
+FILE=/tmp/led-enable
+RELAY=/sys/class/gpio/power_relay/value
+
+start_service() {
+	[ -f "${FILE}" ] || echo 1 >"${FILE}"
+	procd_open_instance
+	procd_set_param command /sbin/inotifyd /usr/bin/led_control.sh "${RELAY}":c "${FILE}":c
+	procd_close_instance
+}
+

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+[ "${ACTION}" = "released" ] || exit 0
+
+brightness_control.sh
+
+exit 0
+

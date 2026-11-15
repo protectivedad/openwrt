@@ -1,0 +1,23 @@
+
+CONFIG=/etc/config/mqtt-client
+
+[ -f "${CONFIG}" ] && exit 0
+
+. /usr/share/libubox/jshn.sh
+
+json_init
+json_load "$(cat /etc/board.json)"
+json_select system
+json_get_var hostname "hostname"
+
+touch "${CONFIG}"
+uci -q batch <<-EOF >/dev/null
+	set mqtt-client.wwan=mqtt-client
+	set mqtt-client.wwan.enabled='0'
+	set mqtt-client.wwan.host='fqdn.mqtt.broker.lan'
+	set mqtt-client.wwan.client='${hostname:-hostname}'
+	set mqtt-client.wwan.password='yourpassword'
+	set mqtt-client.wwan.ca='/etc/ca.der'
+	commit mqtt-client
+-EOF
+

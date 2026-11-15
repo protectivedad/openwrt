@@ -1,0 +1,74 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=10
+USE_PROCD=1
+
+CONF=/tmp/udhcpd.conf
+LEASES=/tmp/udhcpd.leases
+
+generate_conf() {
+    # Read LAN settings from /etc/config/network
+    local ifname ipaddr netmask
+    config_load network
+    config_get ifname lan device
+    config_get ipaddr lan ipaddr
+    config_get netmask lan netmask
+
+    # Fallback for CC-era "ifname" key
+    [ -z "$ifname" ] && {
+        config_get ifname lan ifname
+    }
+
+    # Read DHCP range from /etc/config/dhcp (lan section)
+    local start end leasetime
+    config_load dhcp
+    config_get start lan start
+    config_get end   lan end
+    config_get leasetime lan leasetime
+
+    # Defaults
+    [ -z "$start" ]     && start="${ipaddr%.*}.100"
+    [ -z "$end" ]       && end="${ipaddr%.*}.200"
+    [ -z "$leasetime" ] && leasetime="12h"
+
+    # Convert leasetime to seconds (udhcpd wants seconds)
+    case "$leasetime" in
+        *h) leasetime=$(( ${leasetime%h} * 3600 )) ;;
+        *m) leasetime=$(( ${leasetime%m} * 60 )) ;;
+    esac
+
+    # siaddr = network address (ipaddr & netmask)
+    local siaddr
+    siaddr=$( /bin/ipcalc -n "$ipaddr" "$netmask" 2>/dev/null | grep '^Network Address' | awk '{print $3}' )
+    [ -z "$siaddr" ] && siaddr="$ipaddr"
+
+    touch "$LEASES"
+    cat > "$CONF" <<EOF
+interface br-lan
+start $start
+end $end
+offset 0
+max_leases 50
+lease_file "$LEASES"
+siaddr $siaddr
+snmask $netmask
+routers $ipaddr
+dns $ipaddr
+opt lease $leasetime
+EOF
+}
+
+start_service() {
+    generate_conf
+    procd_open_instance
+    procd_set_param command /usr/sbin/udhcpd -f "$CONF"
+    procd_set_param respawn
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_close_instance
+}
+
+stop_service() {
+    :
+}
